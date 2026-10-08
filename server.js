@@ -14,7 +14,9 @@ const ENVIRONMENT = process.env.NODE_ENV || 'development';
 const DATABASE_URL = process.env.DATABASE_URL || '';
 const USE_POSTGRES = Boolean(DATABASE_URL);
 const DATA_DIR = path.join(__dirname, 'data');
-const DB_PATH = path.join(DATA_DIR, 'app.db');
+const DB_PATH = process.env.SQLITE_DB_PATH || path.join(DATA_DIR, 'app.db');
+const SESSION_COOKIE = 'azrp_session';
+const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60;
 
 let db = null;
 let pgClient = null;
@@ -117,23 +119,15 @@ async function initDatabase() {
         telegram TEXT UNIQUE,
         discord TEXT,
         auth_source TEXT DEFAULT 'manual',
-        packages_count INTEGER DEFAULT 6,
-        balance INTEGER DEFAULT 420,
-        rating DOUBLE PRECISION DEFAULT 4.9,
-        downloads INTEGER DEFAULT 12000,
+        packages_count INTEGER DEFAULT 0,
+        balance INTEGER DEFAULT 0,
+        rating DOUBLE PRECISION DEFAULT 0,
+        downloads INTEGER DEFAULT 0,
         created_at TIMESTAMPTZ DEFAULT NOW(),
         updated_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
 
-    const currentUser = await getSql('SELECT id FROM users LIMIT 1');
-    if (!currentUser) {
-      await runSql(
-        `INSERT INTO users (nickname, telegram, discord, auth_source, packages_count, balance, rating, downloads)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-        ['AZRider_77', '@arzmodsbot', 'discord', 'demo', 6, 420, 4.9, 12000]
-      );
-    }
     return;
   }
 
@@ -144,23 +138,15 @@ async function initDatabase() {
       telegram TEXT UNIQUE,
       discord TEXT,
       auth_source TEXT DEFAULT 'manual',
-      packages_count INTEGER DEFAULT 6,
-      balance INTEGER DEFAULT 420,
-      rating REAL DEFAULT 4.9,
-      downloads INTEGER DEFAULT 12000,
+      packages_count INTEGER DEFAULT 0,
+      balance INTEGER DEFAULT 0,
+      rating REAL DEFAULT 0,
+      downloads INTEGER DEFAULT 0,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  const currentUser = await getSql('SELECT id FROM users LIMIT 1');
-  if (!currentUser) {
-    await runSql(
-      `INSERT INTO users (nickname, telegram, discord, auth_source, packages_count, balance, rating, downloads)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      ['AZRider_77', '@arzmodsbot', 'discord', 'demo', 6, 420, 4.9, 12000]
-    );
-  }
 }
 
 function normalizeProfile(body = {}) {
@@ -169,6 +155,48 @@ function normalizeProfile(body = {}) {
     telegram: String(body.telegram || '').trim(),
     discord: String(body.discord || '').trim(),
     authSource: body.authSource || 'manual'
+  };
+}
+
+function createSessionCookie(userId) {
+  const expiresAt = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
+  const value = `${userId}.${expiresAt}`;
+  const signature = crypto.createHmac('sha256', BOT_TOKEN).update(value).digest('hex');
+  const secure = ENVIRONMENT === 'production' ? '; Secure' : '';
+  return `${SESSION_COOKIE}=${value}.${signature}; Max-Age=${SESSION_TTL_SECONDS}; Path=/; HttpOnly; SameSite=Lax${secure}`;
+}
+
+function getSessionUserId(req) {
+  if (!BOT_TOKEN) return null;
+
+  const cookies = (req.headers.cookie || '').split(';');
+  const cookie = cookies.map((part) => part.trim()).find((part) => part.startsWith(`${SESSION_COOKIE}=`));
+  if (!cookie) return null;
+
+  const [userId, expiresAt, signature, ...extra] = cookie.slice(SESSION_COOKIE.length + 1).split('.');
+  if (extra.length || !/^\d+$/.test(userId) || !/^\d+$/.test(expiresAt)) return null;
+  if (Number(expiresAt) <= Math.floor(Date.now() / 1000)) return null;
+
+  const value = `${userId}.${expiresAt}`;
+  const expected = crypto.createHmac('sha256', BOT_TOKEN).update(value).digest();
+  let received;
+  try {
+    received = Buffer.from(signature, 'hex');
+  } catch {
+    return null;
+  }
+
+  if (received.length !== expected.length || !crypto.timingSafeEqual(received, expected)) return null;
+  return Number(userId);
+}
+
+function publicProfile(profile) {
+  return {
+    id: profile.id,
+    nickname: profile.nickname,
+    telegram: profile.telegram,
+    authSource: profile.auth_source,
+    createdAt: profile.created_at
   };
 }
 
@@ -195,8 +223,8 @@ async function upsertProfile(profile) {
     }
 
     const result = await runSql(
-      `INSERT INTO users (nickname, telegram, discord, auth_source, packages_count, balance, rating, downloads)
-       VALUES ($1, $2, $3, $4, 6, 420, 4.9, 12000)
+      `INSERT INTO users (nickname, telegram, discord, auth_source)
+       VALUES ($1, $2, $3, $4)
        RETURNING *`,
       [nickname, telegram, discord, authSource]
     );
@@ -220,8 +248,8 @@ async function upsertProfile(profile) {
   }
 
   await runSql(
-    `INSERT INTO users (nickname, telegram, discord, auth_source, packages_count, balance, rating, downloads)
-     VALUES (?, ?, ?, ?, 6, 420, 4.9, 12000)`,
+    `INSERT INTO users (nickname, telegram, discord, auth_source)
+     VALUES (?, ?, ?, ?)`,
     [nickname, telegram, discord, authSource]
   );
 
@@ -258,55 +286,42 @@ function isTelegramDataValid(data) {
 }
 
 app.get('/api/profile', async (req, res) => {
-  const row = await getSql('SELECT * FROM users ORDER BY id DESC LIMIT 1');
-  res.json(row || { nickname: '', telegram: '', discord: '', auth_source: 'manual' });
+  const userId = getSessionUserId(req);
+  if (!userId) return res.status(401).json({ success: false, message: 'Authentication required' });
+
+  const row = await getSql(
+    USE_POSTGRES ? 'SELECT * FROM users WHERE id = $1' : 'SELECT * FROM users WHERE id = ?',
+    [userId]
+  );
+  return res.json(row ? publicProfile(row) : null);
 });
 
 app.get('/api/dashboard', async (req, res) => {
-  const row = await getSql('SELECT * FROM users ORDER BY id DESC LIMIT 1');
-  const profile = row || {
-    nickname: 'AZRider_77',
-    telegram: '@arzmodsbot',
-    discord: '',
-    auth_source: 'demo',
-    packages_count: 6,
-    balance: 420,
-    rating: 4.9,
-    downloads: 12000
-  };
+  const userId = getSessionUserId(req);
+  if (!userId) return res.json({ profile: null });
 
-  res.json({
-    profile: {
-      nickname: profile.nickname,
-      telegram: profile.telegram,
-      discord: profile.discord,
-      authSource: profile.auth_source,
-      packagesCount: Number(profile.packages_count ?? 6),
-      balance: Number(profile.balance ?? 420),
-      rating: Number(profile.rating ?? 4.9),
-      downloads: Number(profile.downloads ?? 12000)
-    }
-  });
+  const row = await getSql(
+    USE_POSTGRES ? 'SELECT * FROM users WHERE id = $1' : 'SELECT * FROM users WHERE id = ?',
+    [userId]
+  );
+  return res.json({ profile: row ? publicProfile(row) : null });
 });
 
 app.post('/api/profile', async (req, res) => {
+  const userId = getSessionUserId(req);
+  if (!userId) return res.status(401).json({ success: false, message: 'Authentication required' });
+
   const profile = normalizeProfile(req.body || {});
+  if (!profile.nickname) return res.status(400).json({ success: false, message: 'nickname is required' });
 
-  if (!profile.nickname && !profile.telegram) {
-    return res.status(400).json({ success: false, message: 'nickname or telegram is required' });
-  }
-
-  const saved = await upsertProfile(profile);
-  return res.json({ success: true, profile: {
-    nickname: saved.nickname,
-    telegram: saved.telegram,
-    discord: saved.discord,
-    authSource: saved.auth_source,
-    packagesCount: Number(saved.packages_count ?? 6),
-    balance: Number(saved.balance ?? 420),
-    rating: Number(saved.rating ?? 4.9),
-    downloads: Number(saved.downloads ?? 12000)
-  }});
+  const saved = await getSql(
+    USE_POSTGRES
+      ? `UPDATE users SET nickname = $1, discord = $2, updated_at = NOW() WHERE id = $3 RETURNING *`
+      : `UPDATE users SET nickname = ?, discord = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? RETURNING *`,
+    [profile.nickname, profile.discord, userId]
+  );
+  if (!saved) return res.status(404).json({ success: false, message: 'Profile not found' });
+  return res.json({ success: true, profile: publicProfile(saved) });
 });
 
 app.post('/api/telegram-auth', async (req, res) => {
@@ -325,16 +340,14 @@ app.post('/api/telegram-auth', async (req, res) => {
     authSource: 'telegram'
   });
 
-  return res.json({ success: true, profile: {
-    nickname: saved.nickname,
-    telegram: saved.telegram,
-    discord: saved.discord,
-    authSource: saved.auth_source,
-    packagesCount: Number(saved.packages_count ?? 6),
-    balance: Number(saved.balance ?? 420),
-    rating: Number(saved.rating ?? 4.9),
-    downloads: Number(saved.downloads ?? 12000)
-  }});
+  res.setHeader('Set-Cookie', createSessionCookie(saved.id));
+  return res.json({ success: true, profile: publicProfile(saved) });
+});
+
+app.post('/api/logout', (req, res) => {
+  const secure = ENVIRONMENT === 'production' ? '; Secure' : '';
+  res.setHeader('Set-Cookie', `${SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax${secure}`);
+  return res.json({ success: true });
 });
 
 app.get('/api/config', (req, res) => {

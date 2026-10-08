@@ -58,45 +58,45 @@ const closeLoginDialog = document.getElementById('closeLoginDialog');
 const telegramWidgetWrapper = document.getElementById('telegramWidgetWrapper');
 const telegramMessage = document.getElementById('telegramMessage');
 const profileUsername = document.getElementById('profileUsername');
-const packagesCount = document.getElementById('packagesCount');
-const balanceValue = document.getElementById('balanceValue');
-const ratingValue = document.getElementById('ratingValue');
+const profileSection = document.getElementById('profileSection');
+const profileNavLink = document.getElementById('profileNavLink');
+const profileTelegram = document.getElementById('profileTelegram');
+const profileAvatar = document.getElementById('profileAvatar');
+const profileJoined = document.getElementById('profileJoined');
+const profileNotice = document.getElementById('profileNotice');
+const logoutButton = document.getElementById('logoutButton');
 
 const TELEGRAM_BOT_USERNAME = 'arzmodsbot';
 let activeFilter = 'all';
+let currentProfile = null;
 
-function renderCounters(profile) {
-  if (!profile) return;
+function renderProfile(profile) {
+  currentProfile = profile;
+  const nickname = profile.nickname || 'TelegramUser';
+  const initials = [...nickname].slice(0, 2).join('').toUpperCase();
 
-  if (packagesCount) {
-    packagesCount.textContent = String(profile.packagesCount ?? 6).padStart(2, '0');
+  if (profileUsername) profileUsername.textContent = nickname;
+  if (profileTelegram) profileTelegram.textContent = profile.telegram || 'Telegram';
+  if (profileAvatar) profileAvatar.textContent = initials || 'AZ';
+  if (profileJoined) {
+    const joined = profile.createdAt ? new Date(profile.createdAt) : null;
+    profileJoined.textContent = joined && !Number.isNaN(joined.getTime())
+      ? joined.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
+      : 'Дата недоступна';
   }
-
-  if (balanceValue) {
-    balanceValue.textContent = `$${Number(profile.balance ?? 420)}`;
-  }
-
-  if (ratingValue) {
-    ratingValue.textContent = Number(profile.rating ?? 4.9).toFixed(1);
-  }
+  if (openLoginDialog) openLoginDialog.textContent = nickname;
+  if (profileSection) profileSection.hidden = false;
+  if (profileNavLink) profileNavLink.hidden = false;
 }
 
 async function loadProfile() {
   try {
     const response = await fetch('/api/dashboard');
+    if (!response.ok) throw new Error(`Dashboard request failed with status ${response.status}`);
     const data = await response.json();
     const profile = data?.profile || null;
 
-    if (!profile) {
-      return;
-    }
-
-    renderCounters(profile);
-
-    if (profile.nickname) {
-      if (profileUsername) profileUsername.textContent = profile.nickname;
-    }
-
+    if (profile) renderProfile(profile);
   } catch (error) {
     console.error('Failed to load dashboard profile', error);
   }
@@ -159,21 +159,59 @@ window.onTelegramAuth = async (user) => {
     }
 
     telegramMessage.textContent = 'Telegram авторизація успішна. Профіль збережено.';
-    if (profileUsername) profileUsername.textContent = result.profile.nickname;
-    if (openLoginDialog) openLoginDialog.textContent = result.profile.nickname;
-    renderCounters(result.profile);
     loginDialog?.close();
+    renderProfile(result.profile);
+    profileSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (error) {
     console.error('Telegram authentication failed', error);
     telegramMessage.textContent = 'Telegram авторизація не пройшла перевірку. Перевірте конфігурацію бота.';
   }
 };
 
-openLoginDialog?.addEventListener('click', () => loginDialog?.showModal());
+openLoginDialog?.addEventListener('click', () => {
+  if (currentProfile) {
+    profileSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+  loginDialog?.showModal();
+});
 closeLoginDialog?.addEventListener('click', () => loginDialog?.close());
 loginDialog?.addEventListener('click', (event) => {
   if (event.target === loginDialog) {
     loginDialog.close();
+  }
+});
+
+document.querySelectorAll('[data-profile-tab]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const selectedTab = button.dataset.profileTab;
+    document.querySelectorAll('[data-profile-tab]').forEach((tab) => {
+      const selected = tab === button;
+      tab.classList.toggle('active', selected);
+      tab.setAttribute('aria-selected', String(selected));
+    });
+    document.querySelectorAll('[data-profile-panel]').forEach((panel) => {
+      panel.hidden = panel.dataset.profilePanel !== selectedTab;
+    });
+  });
+});
+
+logoutButton?.addEventListener('click', async () => {
+  if (profileNotice) profileNotice.textContent = '';
+  logoutButton.disabled = true;
+  try {
+    const response = await fetch('/api/logout', { method: 'POST' });
+    if (!response.ok) throw new Error(`Logout request failed with status ${response.status}`);
+    currentProfile = null;
+    if (profileSection) profileSection.hidden = true;
+    if (profileNavLink) profileNavLink.hidden = true;
+    if (openLoginDialog) openLoginDialog.textContent = 'Увійти';
+    document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' });
+  } catch (error) {
+    console.error('Failed to log out', error);
+    if (profileNotice) profileNotice.textContent = 'Не вдалося вийти. Спробуйте ще раз.';
+  } finally {
+    logoutButton.disabled = false;
   }
 });
 
