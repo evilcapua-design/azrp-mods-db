@@ -52,7 +52,9 @@ const mods = [
 const modsGrid = document.getElementById('modsGrid');
 const filterButtons = document.querySelectorAll('.filter-chip');
 const searchInput = document.getElementById('searchInput');
-const authForm = document.getElementById('authForm');
+const openLoginDialog = document.getElementById('openLoginDialog');
+const loginDialog = document.getElementById('loginDialog');
+const closeLoginDialog = document.getElementById('closeLoginDialog');
 const telegramWidgetWrapper = document.getElementById('telegramWidgetWrapper');
 const telegramMessage = document.getElementById('telegramMessage');
 const profileUsername = document.getElementById('profileUsername');
@@ -92,20 +94,9 @@ async function loadProfile() {
     renderCounters(profile);
 
     if (profile.nickname) {
-      const input = authForm?.querySelector('input[name="nickname"]');
-      if (input) input.value = profile.nickname;
       if (profileUsername) profileUsername.textContent = profile.nickname;
     }
 
-    if (profile.telegram) {
-      const input = authForm?.querySelector('input[name="telegram"]');
-      if (input) input.value = profile.telegram;
-    }
-
-    if (profile.discord) {
-      const input = authForm?.querySelector('input[name="discord"]');
-      if (input) input.value = profile.discord;
-    }
   } catch (error) {
     console.error('Failed to load dashboard profile', error);
   }
@@ -140,7 +131,6 @@ async function initTelegramLogin() {
       telegramMessage.textContent = 'Не вдалося завантажити кнопку Telegram. Оновіть сторінку та спробуйте ще раз.';
     };
     telegramWidgetWrapper.appendChild(script);
-    telegramWidgetWrapper.classList.add('visible');
     telegramMessage.textContent = 'Натисніть кнопку Telegram, щоб увійти.';
   } catch (error) {
     console.error('Failed to initialize Telegram Login', error);
@@ -155,14 +145,6 @@ window.onTelegramAuth = async (user) => {
   }
 
   const nickname = user.username || user.first_name || 'TelegramUser';
-  const telegram = user.username ? `@${user.username}` : `id:${user.id}`;
-
-  const nicknameInput = authForm?.querySelector('input[name="nickname"]');
-  const telegramInput = authForm?.querySelector('input[name="telegram"]');
-
-  if (nicknameInput) nicknameInput.value = nickname;
-  if (telegramInput) telegramInput.value = telegram;
-  if (profileUsername) profileUsername.textContent = nickname;
 
   try {
     const response = await fetch('/api/telegram-auth', {
@@ -178,11 +160,22 @@ window.onTelegramAuth = async (user) => {
 
     telegramMessage.textContent = 'Telegram авторизація успішна. Профіль збережено.';
     if (profileUsername) profileUsername.textContent = result.profile.nickname;
+    if (openLoginDialog) openLoginDialog.textContent = result.profile.nickname;
     renderCounters(result.profile);
+    loginDialog?.close();
   } catch (error) {
+    console.error('Telegram authentication failed', error);
     telegramMessage.textContent = 'Telegram авторизація не пройшла перевірку. Перевірте конфігурацію бота.';
   }
 };
+
+openLoginDialog?.addEventListener('click', () => loginDialog?.showModal());
+closeLoginDialog?.addEventListener('click', () => loginDialog?.close());
+loginDialog?.addEventListener('click', (event) => {
+  if (event.target === loginDialog) {
+    loginDialog.close();
+  }
+});
 
 function renderMods() {
   const query = searchInput.value.trim().toLowerCase();
@@ -237,45 +230,6 @@ filterButtons.forEach((button) => {
 });
 
 searchInput.addEventListener('input', renderMods);
-
-if (authForm) {
-  authForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-
-    const formData = new FormData(authForm);
-    const payload = {
-      nickname: formData.get('nickname')?.toString().trim() || '',
-      telegram: formData.get('telegram')?.toString().trim() || '',
-      discord: formData.get('discord')?.toString().trim() || '',
-      authSource: 'manual'
-    };
-
-    if (!payload.nickname || !payload.telegram) {
-      telegramMessage.textContent = 'Укажіть нікнейм і Telegram ID.';
-      return;
-    }
-
-    const submitButton = authForm.querySelector('.auth-submit');
-    submitButton.textContent = 'Збереження...';
-    submitButton.disabled = true;
-
-    const response = await fetch('/api/profile', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    const result = await response.json();
-    if (result.success) {
-      submitButton.textContent = 'Профіль збережено';
-      if (profileUsername) profileUsername.textContent = payload.nickname;
-      telegramMessage.textContent = 'Профіль успішно збережено на сервері.';
-      renderCounters(result.profile);
-    }
-
-    submitButton.disabled = false;
-  });
-}
 
 initTelegramLogin();
 loadProfile();

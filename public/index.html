@@ -33,8 +33,7 @@
           </nav>
 
           <div class="nav-actions">
-            <button class="ghost-button" type="button">Discord</button>
-            <button class="primary-button" type="button">Скачати</button>
+            <button class="primary-button" id="openLoginDialog" type="button">Увійти</button>
           </div>
         </div>
       </header>
@@ -259,35 +258,6 @@
               </div>
             </div>
 
-            <div class="auth-panel">
-              <div class="auth-header">
-                <span class="eyebrow">Профіль</span>
-                <h3>Авторизація через Telegram</h3>
-              </div>
-
-              <div id="telegramWidgetWrapper" class="telegram-widget-wrapper" aria-live="polite"></div>
-
-              <div id="telegramMessage" class="telegram-message" aria-live="polite"></div>
-
-              <form class="auth-form" id="authForm">
-                <label>
-                  <span>Нікнейм</span>
-                  <input type="text" name="nickname" placeholder="Наприклад: AZRider_77" required />
-                </label>
-
-                <label>
-                  <span>Telegram ID</span>
-                  <input type="text" name="telegram" placeholder="@username або ID" required />
-                </label>
-
-                <label>
-                  <span>Discord / сервер</span>
-                  <input type="text" name="discord" placeholder="Discord або назва сервера" />
-                </label>
-
-                <button class="primary-button auth-submit" type="submit">Зберегти профіль</button>
-              </form>
-            </div>
           </div>
         </section>
 
@@ -311,7 +281,7 @@
 
               <details>
                 <summary>Як отримати доступ до нових релізів?</summary>
-                <p>Підписка на Discord або розсилку дозволяє вчасно отримувати оновлення, патчі та нові версії.</p>
+                <p>Підписка на розсилку дозволяє вчасно отримувати оновлення, патчі та нові версії.</p>
               </details>
             </div>
           </div>
@@ -336,6 +306,17 @@
         </div>
       </footer>
     </div>
+
+    <dialog class="login-dialog" id="loginDialog" aria-labelledby="loginDialogTitle">
+      <div class="login-dialog-header">
+        <span class="eyebrow">Ваш профіль</span>
+        <button class="login-dialog-close" id="closeLoginDialog" type="button" aria-label="Закрити">×</button>
+      </div>
+      <h2 id="loginDialogTitle">Вхід через Telegram</h2>
+      <p>Увійдіть, щоб відкрити свій профіль.</p>
+      <div id="telegramWidgetWrapper" class="telegram-widget-wrapper" aria-live="polite"></div>
+      <div id="telegramMessage" class="telegram-message" aria-live="polite"></div>
+    </dialog>
 
     <script src="script.js"></script>
   </body>
