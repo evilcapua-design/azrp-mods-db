@@ -118,6 +118,7 @@ async function loadProfile() {
       renderProfile(profile);
     } else if (profileLoginPrompt) {
       profileLoginPrompt.hidden = false;
+      loginDialog?.showModal();
     }
   } catch (error) {
     console.error('Failed to load dashboard profile', error);
