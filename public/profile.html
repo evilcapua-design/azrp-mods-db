@@ -40,8 +40,9 @@
               <p class="account-telegram" id="profileTelegram"></p>
               <div class="account-divider"></div>
               <button class="account-tab active" type="button" data-profile-tab="overview" aria-selected="true">Огляд профілю</button>
-              <button class="account-tab" type="button" data-profile-tab="downloads" aria-selected="false">Мої завантаження</button>
+              <button class="account-tab" type="button" data-profile-tab="scripts" aria-selected="false">Мої скрипти</button>
               <button class="account-tab" type="button" data-profile-tab="favorites" aria-selected="false">Обране</button>
+              <button class="account-tab" id="adminPanelTab" type="button" data-profile-tab="admin" aria-selected="false" hidden>Адмін-меню</button>
               <button class="account-logout" id="logoutButton" type="button">Вийти з акаунта</button>
             </aside>
 
@@ -63,19 +64,46 @@
                     <span>Спосіб входу</span>
                     <strong>Telegram</strong>
                   </article>
+                  <article class="account-info-card">
+                    <span>Ваш Telegram ID</span>
+                    <strong id="profileTelegramId">—</strong>
+                  </article>
                 </div>
+                <p class="account-admin-setup" id="adminSetupHint" hidden>
+                  Щоб увімкнути для себе адмін-меню, додайте цей Telegram ID у змінну
+                  <code>ADMIN_TELEGRAM_IDS</code> у Render → Environment. Не додавайте ID інших користувачів.
+                </p>
                 <div class="account-activity">
                   <h3>Остання активність</h3>
                   <p>Ви увійшли до спільноти AZRP Mods через Telegram.</p>
                 </div>
               </section>
 
-              <section class="account-panel" data-profile-panel="downloads" hidden>
-                <span class="eyebrow">Бібліотека</span>
-                <h1>Мої завантаження</h1>
-                <div class="account-empty-state">
-                  <strong>Поки що тут порожньо</strong>
-                  <p>Завантажені моди з’являться тут, коли ця функція буде доступна.</p>
+              <section class="account-panel" data-profile-panel="scripts" hidden>
+                <span class="eyebrow">Публікації спільноти</span>
+                <h1>Завантажити скрипт</h1>
+                <p class="account-intro">Кожен файл перевіряється адміністратором і публікується лише після схвалення.</p>
+                <form class="script-upload-form" id="scriptUploadForm">
+                  <label>
+                    <span>Назва скрипту</span>
+                    <input name="title" type="text" minlength="3" maxlength="80" required />
+                  </label>
+                  <label>
+                    <span>Опис</span>
+                    <textarea name="description" rows="4" maxlength="1000" required></textarea>
+                  </label>
+                  <label>
+                    <span>Файл скрипту (.lua, .cs, .js або .txt; до 2 МБ)</span>
+                    <input name="scriptFile" type="file" accept=".lua,.cs,.js,.txt,text/plain" required />
+                  </label>
+                  <button class="primary-button" type="submit" id="scriptUploadSubmit">Надіслати на модерацію</button>
+                  <p class="account-notice" id="scriptUploadMessage" aria-live="polite"></p>
+                </form>
+                <div class="account-activity">
+                  <h3>Мої надіслані скрипти</h3>
+                  <div id="myScriptsList" class="script-list">
+                    <p class="script-list-empty">Завантажені вами скрипти з’являться тут.</p>
+                  </div>
                 </div>
               </section>
 
@@ -85,6 +113,17 @@
                 <div class="account-empty-state">
                   <strong>Поки що немає збережених модів</strong>
                   <p>Тут відображатимуться моди, які ви додасте до обраного.</p>
+                </div>
+              </section>
+              <section class="account-panel" data-profile-panel="admin" hidden>
+                <span class="eyebrow">Керування сайтом</span>
+                <h1>Адмін-меню</h1>
+                <p class="account-intro">Переглядайте надіслані скрипти, завантажуйте їх для перевірки та схвалюйте або відхиляйте.</p>
+                <div class="account-activity">
+                  <h3>Черга модерації</h3>
+                  <div id="moderationQueue" class="script-list">
+                    <p class="script-list-empty">Завантаження черги…</p>
+                  </div>
                 </div>
               </section>
               <p class="account-notice" id="profileNotice" aria-live="polite"></p>

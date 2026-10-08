@@ -23,6 +23,8 @@ services:
         value: arzmodsbot
       - key: TELEGRAM_BOT_TOKEN
         sync: false
+      - key: ADMIN_TELEGRAM_IDS
+        sync: false
 
 databases:
   - name: azrp-mods-db

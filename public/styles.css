@@ -770,6 +770,21 @@ button:disabled {
   line-height: 1.7;
 }
 
+.account-admin-setup {
+  margin: 20px 0 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(251, 191, 36, 0.22);
+  border-radius: 14px;
+  background: rgba(251, 191, 36, 0.07);
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.account-admin-setup code {
+  color: var(--amber);
+}
+
 .account-info-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -842,6 +857,146 @@ button:disabled {
   margin: 12px 0 0;
   color: var(--red);
   font-size: 0.88rem;
+}
+
+.script-upload-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.script-upload-form label {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.script-upload-form input,
+.script-upload-form textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(7, 11, 20, 0.6);
+  color: var(--text);
+}
+
+.script-upload-form input[type="file"] {
+  padding: 10px;
+}
+
+.script-upload-form textarea {
+  resize: vertical;
+}
+
+.script-upload-form .account-notice {
+  margin: 0;
+}
+
+.script-upload-form .account-notice:not(:empty) {
+  color: var(--accent);
+}
+
+.script-upload-form button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.script-list,
+.community-scripts-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.script-list-empty {
+  margin: 0;
+  color: var(--muted);
+}
+
+.script-entry {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(12, 21, 38, 0.74);
+}
+
+.script-entry h4 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.script-entry > p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.script-entry .script-entry-meta {
+  margin-top: 12px;
+  font-size: 0.78rem;
+}
+
+.script-entry .script-entry-note {
+  margin-top: 8px;
+  color: var(--amber);
+}
+
+.script-status {
+  display: inline-flex;
+  margin-top: 12px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(251, 191, 36, 0.1);
+  color: var(--amber);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.script-status-approved {
+  background: rgba(94, 231, 169, 0.1);
+  color: var(--green);
+}
+
+.script-status-rejected {
+  background: rgba(251, 113, 133, 0.1);
+  color: var(--red);
+}
+
+.script-entry-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.script-action {
+  width: auto;
+  min-height: 38px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  text-decoration: none;
+}
+
+.script-action:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.community-scripts-heading {
+  margin: 36px 0 18px;
+}
+
+.community-scripts-heading h3 {
+  margin: 8px 0 0;
+  font-size: 1.4rem;
+}
+
+.community-scripts-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .telegram-widget-wrapper {
@@ -1023,6 +1178,10 @@ button:disabled {
   }
 
   .account-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .community-scripts-grid {
     grid-template-columns: 1fr;
   }
 
