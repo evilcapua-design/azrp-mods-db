@@ -53,7 +53,6 @@ const modsGrid = document.getElementById('modsGrid');
 const filterButtons = document.querySelectorAll('.filter-chip');
 const searchInput = document.getElementById('searchInput');
 const authForm = document.getElementById('authForm');
-const telegramLoginBtn = document.getElementById('telegramLoginBtn');
 const telegramWidgetWrapper = document.getElementById('telegramWidgetWrapper');
 const telegramMessage = document.getElementById('telegramMessage');
 const profileUsername = document.getElementById('profileUsername');
@@ -112,16 +111,20 @@ async function loadProfile() {
   }
 }
 
-function initTelegramLogin() {
-  if (!telegramWidgetWrapper || !telegramLoginBtn || !TELEGRAM_BOT_USERNAME) {
+async function initTelegramLogin() {
+  if (!telegramWidgetWrapper || !TELEGRAM_BOT_USERNAME) {
     return;
   }
 
-  const configResponse = fetch('/api/config').then((res) => res.json());
-  configResponse.then((config) => {
-    const widgetAvailable = config.telegramLoginEnabled || config.demoMode;
-    if (!widgetAvailable) {
-      telegramMessage.textContent = 'Локальний демо-режим: Telegram Login буде активний після підключення реального бота та HTTPS.';
+  try {
+    const response = await fetch('/api/config');
+    if (!response.ok) {
+      throw new Error(`Telegram config request failed with status ${response.status}`);
+    }
+
+    const config = await response.json();
+    if (!config.telegramLoginEnabled) {
+      telegramMessage.textContent = 'Вхід через Telegram тимчасово недоступний. Спробуйте пізніше.';
       return;
     }
 
@@ -133,18 +136,16 @@ function initTelegramLogin() {
     script.setAttribute('data-radius', '18');
     script.setAttribute('data-request-access', 'write');
     script.setAttribute('data-onauth', 'onTelegramAuth(user)');
+    script.onerror = () => {
+      telegramMessage.textContent = 'Не вдалося завантажити кнопку Telegram. Оновіть сторінку та спробуйте ще раз.';
+    };
     telegramWidgetWrapper.appendChild(script);
     telegramWidgetWrapper.classList.add('visible');
-
-    telegramMessage.textContent = 'Telegram Login підключено в демо-режимі. Для продакшну потрібен реальний бот і HTTPS.';
-  });
-
-  telegramLoginBtn.addEventListener('click', () => {
-    const iframe = telegramWidgetWrapper.querySelector('iframe');
-    if (iframe) {
-      iframe.click();
-    }
-  });
+    telegramMessage.textContent = 'Натисніть кнопку Telegram, щоб увійти.';
+  } catch (error) {
+    console.error('Failed to initialize Telegram Login', error);
+    telegramMessage.textContent = 'Не вдалося підключити вхід через Telegram. Оновіть сторінку та спробуйте ще раз.';
+  }
 }
 
 window.onTelegramAuth = async (user) => {

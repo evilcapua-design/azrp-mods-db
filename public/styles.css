@@ -732,22 +732,6 @@ button:disabled {
   margin-top: 14px;
 }
 
-.telegram-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  width: 100%;
-  margin-top: 18px;
-  padding: 0.95rem 1.1rem;
-  border: 0;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #2ea5ff, #4cc9f0);
-  color: #031522;
-  font-weight: 800;
-  box-shadow: 0 16px 28px rgba(76, 201, 240, 0.3);
-}
-
 .telegram-widget-wrapper {
   display: none;
   margin-top: 14px;
@@ -762,15 +746,6 @@ button:disabled {
   margin-top: 10px;
   color: var(--muted);
   font-size: 0.82rem;
-}
-
-.telegram-icon {
-  display: inline-grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(3, 21, 34, 0.15);
 }
 
 .auth-header h3 {
