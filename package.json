@@ -1,0 +1,25 @@
+{
+  "name": "azrpmods",
+  "version": "1.0.0",
+  "description": "Arizona Online SA:MP mods portal with Telegram auth and profile",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "healthcheck": "node -e \"fetch('http://localhost:' + (process.env.PORT || 3000) + '/api/health').then((response) => { if (!response.ok) { throw new Error('healthcheck failed'); } return response.json(); }).then((data) => { if (!data.ok) { throw new Error('service unhealthy'); } console.log('healthcheck: ok'); }).catch((error) => { console.error(error); process.exit(1); });\""
+  },
+  "keywords": [
+    "sa-mp",
+    "arizona",
+    "mods",
+    "telegram"
+  ],
+  "author": "Copilot",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^18.0.6",
+    "express": "^5.2.1",
+    "pg": "^8.13.0",
+    "sqlite3": "^6.0.1"
+  }
+}

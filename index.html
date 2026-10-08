@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Сайт з модами для Arizona Online SA:MP — інструменти, HUD, графіка й комфорт для гри."
+    />
+    <title>AZRP Mods | Arizona Online SA:MP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="container nav-wrap">
+          <a href="#home" class="brand" aria-label="Главная">
+            <span class="brand-mark">AZ</span>
+            <span>RP Mods</span>
+          </a>
+
+          <nav class="main-nav" aria-label="Основна навігація">
+            <a href="#mods">Моди</a>
+            <a href="#features">Переваги</a>
+            <a href="#how-it-works">Як це працює</a>
+            <a href="#faq">FAQ</a>
+          </nav>
+
+          <div class="nav-actions">
+            <button class="ghost-button" type="button">Discord</button>
+            <button class="primary-button" type="button">Скачати</button>
+          </div>
+        </div>
+      </header>
+
+      <main id="home">
+        <section class="hero">
+          <div class="container hero-grid">
+            <div class="hero-copy">
+              <span class="eyebrow">Arizona Online SA:MP</span>
+              <h1>Моди, які дають перевагу в грі й комфорт у ролі.</h1>
+              <p>
+                Пакети, HUD, інтерфейс, геймплейні утиліти та графіка для вантажних
+                ролей, перегоночних сценаріїв і повсякденного гри на Arizona Online.
+              </p>
+
+              <div class="hero-actions">
+                <button class="primary-button large" type="button">Подивитися моди</button>
+                <button class="secondary-button large" type="button">Підписатися</button>
+              </div>
+
+              <ul class="hero-stats" aria-label="Статистика про проєкт">
+                <li>
+                  <strong>12k+</strong>
+                  <span>скачувань</span>
+                </li>
+                <li>
+                  <strong>4.9/5</strong>
+                  <span>рейтинг</span>
+                </li>
+                <li>
+                  <strong>24/7</strong>
+                  <span>підтримка</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="hero-card" aria-label="Прев'ю модів">
+              <div class="glass-panel">
+                <div class="panel-head">
+                  <span class="dot red"></span>
+                  <span class="dot amber"></span>
+                  <span class="dot green"></span>
+                </div>
+
+                <div class="screen-body">
+                  <div class="mini-header">
+                    <span>AZRP HUD</span>
+                    <span class="pill success">online</span>
+                  </div>
+
+                  <div class="hud-row">
+                    <div>
+                      <small>HP</small>
+                      <strong>99%</strong>
+                    </div>
+                    <div>
+                      <small>ARMOR</small>
+                      <strong>84%</strong>
+                    </div>
+                    <div>
+                      <small>ATM</small>
+                      <strong>$42.3k</strong>
+                    </div>
+                  </div>
+
+                  <div class="bars">
+                    <span style="--bar: 95%"></span>
+                    <span style="--bar: 80%"></span>
+                    <span style="--bar: 72%"></span>
+                  </div>
+
+                  <div class="feature-list">
+                    <span>QOL</span>
+                    <span>HUD</span>
+                    <span>FX</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="brands-strip">
+          <div class="container strip-lists">
+            <span>Arizona Online</span>
+            <span>SA:MP</span>
+            <span>Roleplay</span>
+            <span>Custom HUD</span>
+            <span>Quality of Life</span>
+          </div>
+        </section>
+
+        <section id="mods" class="catalog">
+          <div class="container">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">Каталог</span>
+                <h2>Популярні моди для сервера</h2>
+              </div>
+              <div class="catalog-tools">
+                <label class="search-box" aria-label="Пошук модів">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M10.5 3a7.5 7.5 0 015.97 12.8l4.3 4.3 1.4-1.4-4.3-4.3A7.5 7.5 0 1110.5 3zm0 2a5.5 5.5 0 100 11 5.5 5.5 0 000-11z"/>
+                  </svg>
+                  <input id="searchInput" type="search" placeholder="Пошук по модам..." />
+                </label>
+              </div>
+            </div>
+
+            <div class="filter-row" id="filterRow" aria-label="Фільтри модів">
+              <button class="filter-chip active" data-filter="all" type="button">Всі</button>
+              <button class="filter-chip" data-filter="ui" type="button">UI / HUD</button>
+              <button class="filter-chip" data-filter="utility" type="button">Утиліти</button>
+              <button class="filter-chip" data-filter="graphics" type="button">Графіка</button>
+              <button class="filter-chip" data-filter="gameplay" type="button">Геймплей</button>
+            </div>
+
+            <div class="mods-grid" id="modsGrid" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section id="features" class="features">
+          <div class="container">
+            <div class="section-heading narrow">
+              <span class="eyebrow">Переваги</span>
+              <h2>Що робить наші моди корисними</h2>
+            </div>
+
+            <div class="feature-grid">
+              <article class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Швидка інсталяція</h3>
+                <p>Короткі інструкції, мінімум зайвих кроків і готові збірки для розгортання.</p>
+              </article>
+
+              <article class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Підтримка під RP</h3>
+                <p>Оптимізовані інструменти для ролі, бізнесу, міста, рейдів і повсякденних активностей.</p>
+              </article>
+
+              <article class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>Безпека й стабільність</h3>
+                <p>Пакети перевіряються на конфлікти, стабільність роботи та сумісність із клієнтом.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="how-it-works" class="steps">
+          <div class="container">
+            <div class="section-heading narrow">
+              <span class="eyebrow">Процес</span>
+              <h2>Як працює збірка</h2>
+            </div>
+
+            <div class="steps-grid">
+              <div class="step-card">
+                <span class="step-number">01</span>
+                <h3>Обери пакет</h3>
+                <p>Вибери моду з каталогу за своїм стилем гри та сценарієм.</p>
+              </div>
+
+              <div class="step-card">
+                <span class="step-number">02</span>
+                <h3>Завантажуй</h3>
+                <p>Отримай файл, інструкцію й список рекомендацій для установки.</p>
+              </div>
+
+              <div class="step-card">
+                <span class="step-number">03</span>
+                <h3>Грай комфортно</h3>
+                <p>Починай гру з розширеним інтерфейсом і більш якісним геймплеєм.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="profile-section">
+          <div class="container profile-wrap">
+            <div class="profile-card">
+              <div class="profile-header">
+                <div class="avatar-ring">
+                  <div class="avatar">AZ</div>
+                </div>
+                <div>
+                  <span class="status-badge online">Online</span>
+                  <h3>AZRider_77</h3>
+                </div>
+              </div>
+
+              <div class="profile-meta">
+                <div>
+                  <small>Роль</small>
+                  <strong>Власник пакету</strong>
+                </div>
+                <div>
+                  <small>Сервер</small>
+                  <strong>Arizona Online</strong>
+                </div>
+              </div>
+
+              <div class="profile-stats">
+                <div>
+                  <span>Пакетів</span>
+                  <strong>06</strong>
+                </div>
+                <div>
+                  <span>Баланс</span>
+                  <strong>$420</strong>
+                </div>
+                <div>
+                  <span>Рейтинг</span>
+                  <strong>4.9</strong>
+                </div>
+              </div>
+
+              <div class="profile-actions">
+                <button class="primary-button" type="button">Редагувати</button>
+                <button class="ghost-button" type="button">Підтримка</button>
+              </div>
+            </div>
+
+            <div class="auth-panel">
+              <div class="auth-header">
+                <span class="eyebrow">Профіль</span>
+                <h3>Авторизація через Telegram</h3>
+              </div>
+
+              <button class="telegram-button" id="telegramLoginBtn" type="button">
+                <span class="telegram-icon">✈</span>
+                Увійти через Telegram
+              </button>
+
+              <div id="telegramWidgetWrapper" class="telegram-widget-wrapper" aria-live="polite"></div>
+
+              <form class="auth-form" id="authForm">
+                <label>
+                  <span>Нікнейм</span>
+                  <input type="text" name="nickname" placeholder="Наприклад: AZRider_77" required />
+                </label>
+
+                <label>
+                  <span>Telegram ID</span>
+                  <input type="text" name="telegram" placeholder="@username або ID" required />
+                </label>
+
+                <label>
+                  <span>Discord / сервер</span>
+                  <input type="text" name="discord" placeholder="Discord або назва сервера" />
+                </label>
+
+                <button class="primary-button auth-submit" type="submit">Зберегти профіль</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section id="faq" class="faq">
+          <div class="container faq-wrap">
+            <div class="section-heading narrow left-align">
+              <span class="eyebrow">FAQ</span>
+              <h2>Часті питання</h2>
+            </div>
+
+            <div class="faq-list">
+              <details open>
+                <summary>Чи сумісні моди з Arizona Online?</summary>
+                <p>Так. Ми підбираємо збірки з урахуванням типових вимог сервера і зберігаємо сумісність.</p>
+              </details>
+
+              <details>
+                <summary>Чи потрібен спеціальний клієнт?</summary>
+                <p>Більшість модів працюють через стандартний SA:MP клієнт, але для окремих збірок потрібен рекомендований набір.</p>
+              </details>
+
+              <details>
+                <summary>Як отримати доступ до нових релізів?</summary>
+                <p>Підписка на Discord або розсилку дозволяє вчасно отримувати оновлення, патчі та нові версії.</p>
+              </details>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="container footer-wrap">
+          <div>
+            <a href="#home" class="brand">
+              <span class="brand-mark">AZ</span>
+              <span>RP Mods</span>
+            </a>
+            <p>Пакети для комфортної гри на Arizona Online SA:MP.</p>
+          </div>
+
+          <div class="footer-links">
+            <a href="#mods">Моди</a>
+            <a href="#features">Переваги</a>
+            <a href="#faq">FAQ</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: azrp-mods
+    env: node
+    plan: free
+    region: frankfurt
+    branch: main
+    rootDir: .
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: azrp-mods-db
+          property: connectionString
+      - key: TELEGRAM_BOT_USERNAME
+        value: arzmodsbot
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+
+databases:
+  - name: azrp-mods-db
+    databaseName: azrpmods
+    user: azrpmods
+    plan: free

@@ -1,0 +1,4 @@
+.env
+data/app.db
+data/profile.json
+node_modules/
