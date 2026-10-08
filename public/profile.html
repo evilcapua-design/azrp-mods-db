@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Особистий профіль учасника спільноти AZRP Mods." />
+    <title>Профіль | AZRP Mods</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="container nav-wrap">
+          <a href="/" class="brand" aria-label="Головна">
+            <span class="brand-mark">AZ</span>
+            <span>RP Mods</span>
+          </a>
+          <nav class="main-nav" aria-label="Основна навігація">
+            <a href="/">До каталогу модів</a>
+          </nav>
+          <div class="nav-actions">
+            <button class="primary-button" id="openLoginDialog" type="button">Увійти</button>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="profile-section" id="profileSection">
+          <div class="container profile-wrap" id="accountContent" hidden>
+            <aside class="account-card">
+              <div class="account-avatar" id="profileAvatar" aria-hidden="true">AZ</div>
+              <span class="account-badge">Учасник AZRP Mods</span>
+              <h2 id="profileUsername">Гравець</h2>
+              <p class="account-telegram" id="profileTelegram"></p>
+              <div class="account-divider"></div>
+              <button class="account-tab active" type="button" data-profile-tab="overview" aria-selected="true">Огляд профілю</button>
+              <button class="account-tab" type="button" data-profile-tab="downloads" aria-selected="false">Мої завантаження</button>
+              <button class="account-tab" type="button" data-profile-tab="favorites" aria-selected="false">Обране</button>
+              <button class="account-logout" id="logoutButton" type="button">Вийти з акаунта</button>
+            </aside>
+
+            <div class="account-content">
+              <section class="account-panel" data-profile-panel="overview">
+                <span class="eyebrow">Особистий кабінет</span>
+                <h1>Профіль</h1>
+                <p class="account-intro">Керування акаунтом і перегляд активності на AZRP Mods.</p>
+                <div class="account-info-grid">
+                  <article class="account-info-card">
+                    <span>Статус акаунта</span>
+                    <strong><span class="verified-dot"></span> Telegram підтверджено</strong>
+                  </article>
+                  <article class="account-info-card">
+                    <span>Учасник з</span>
+                    <strong id="profileJoined">—</strong>
+                  </article>
+                  <article class="account-info-card">
+                    <span>Спосіб входу</span>
+                    <strong>Telegram</strong>
+                  </article>
+                </div>
+                <div class="account-activity">
+                  <h3>Остання активність</h3>
+                  <p>Ви увійшли до спільноти AZRP Mods через Telegram.</p>
+                </div>
+              </section>
+
+              <section class="account-panel" data-profile-panel="downloads" hidden>
+                <span class="eyebrow">Бібліотека</span>
+                <h1>Мої завантаження</h1>
+                <div class="account-empty-state">
+                  <strong>Поки що тут порожньо</strong>
+                  <p>Завантажені моди з’являться тут, коли ця функція буде доступна.</p>
+                </div>
+              </section>
+
+              <section class="account-panel" data-profile-panel="favorites" hidden>
+                <span class="eyebrow">Збережене</span>
+                <h1>Обране</h1>
+                <div class="account-empty-state">
+                  <strong>Поки що немає збережених модів</strong>
+                  <p>Тут відображатимуться моди, які ви додасте до обраного.</p>
+                </div>
+              </section>
+              <p class="account-notice" id="profileNotice" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <div class="container profile-login-prompt" id="profileLoginPrompt" hidden>
+            <span class="eyebrow">Особистий кабінет</span>
+            <h1>Увійдіть, щоб побачити профіль</h1>
+            <p>Профіль доступний після авторизації через Telegram.</p>
+            <button class="primary-button" id="profileLoginButton" type="button">Увійти через Telegram</button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog class="login-dialog" id="loginDialog" aria-labelledby="loginDialogTitle">
+      <div class="login-dialog-header">
+        <span class="eyebrow">Ваш профіль</span>
+        <button class="login-dialog-close" id="closeLoginDialog" type="button" aria-label="Закрити">×</button>
+      </div>
+      <h2 id="loginDialogTitle">Вхід через Telegram</h2>
+      <p>Увійдіть, щоб відкрити свій профіль.</p>
+      <div id="telegramWidgetWrapper" class="telegram-widget-wrapper" aria-live="polite"></div>
+      <div id="telegramMessage" class="telegram-message" aria-live="polite"></div>
+    </dialog>
+
+    <script src="script.js"></script>
+  </body>
+</html>

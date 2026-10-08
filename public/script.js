@@ -60,6 +60,9 @@ const telegramMessage = document.getElementById('telegramMessage');
 const profileUsername = document.getElementById('profileUsername');
 const profileSection = document.getElementById('profileSection');
 const profileNavLink = document.getElementById('profileNavLink');
+const accountContent = document.getElementById('accountContent');
+const profileLoginPrompt = document.getElementById('profileLoginPrompt');
+const profileLoginButton = document.getElementById('profileLoginButton');
 const profileTelegram = document.getElementById('profileTelegram');
 const profileAvatar = document.getElementById('profileAvatar');
 const profileJoined = document.getElementById('profileJoined');
@@ -85,7 +88,8 @@ function renderProfile(profile) {
       : 'Дата недоступна';
   }
   if (openLoginDialog) openLoginDialog.textContent = nickname;
-  if (profileSection) profileSection.hidden = false;
+  if (accountContent) accountContent.hidden = false;
+  if (profileLoginPrompt) profileLoginPrompt.hidden = true;
   if (profileNavLink) profileNavLink.hidden = false;
 }
 
@@ -96,7 +100,11 @@ async function loadProfile() {
     const data = await response.json();
     const profile = data?.profile || null;
 
-    if (profile) renderProfile(profile);
+    if (profile) {
+      renderProfile(profile);
+    } else if (profileLoginPrompt) {
+      profileLoginPrompt.hidden = false;
+    }
   } catch (error) {
     console.error('Failed to load dashboard profile', error);
   }
@@ -161,7 +169,7 @@ window.onTelegramAuth = async (user) => {
     telegramMessage.textContent = 'Telegram авторизація успішна. Профіль збережено.';
     loginDialog?.close();
     renderProfile(result.profile);
-    profileSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!accountContent) window.location.assign('/profile.html');
   } catch (error) {
     console.error('Telegram authentication failed', error);
     telegramMessage.textContent = 'Telegram авторизація не пройшла перевірку. Перевірте конфігурацію бота.';
@@ -170,11 +178,16 @@ window.onTelegramAuth = async (user) => {
 
 openLoginDialog?.addEventListener('click', () => {
   if (currentProfile) {
-    profileSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (accountContent) {
+      profileSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      window.location.assign('/profile.html');
+    }
     return;
   }
   loginDialog?.showModal();
 });
+profileLoginButton?.addEventListener('click', () => loginDialog?.showModal());
 closeLoginDialog?.addEventListener('click', () => loginDialog?.close());
 loginDialog?.addEventListener('click', (event) => {
   if (event.target === loginDialog) {
@@ -203,9 +216,14 @@ logoutButton?.addEventListener('click', async () => {
     const response = await fetch('/api/logout', { method: 'POST' });
     if (!response.ok) throw new Error(`Logout request failed with status ${response.status}`);
     currentProfile = null;
-    if (profileSection) profileSection.hidden = true;
+    if (accountContent) accountContent.hidden = true;
+    if (profileLoginPrompt) profileLoginPrompt.hidden = false;
     if (profileNavLink) profileNavLink.hidden = true;
     if (openLoginDialog) openLoginDialog.textContent = 'Увійти';
+    if (accountContent) {
+      window.location.assign('/');
+      return;
+    }
     document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' });
   } catch (error) {
     console.error('Failed to log out', error);
@@ -267,8 +285,8 @@ filterButtons.forEach((button) => {
   });
 });
 
-searchInput.addEventListener('input', renderMods);
+searchInput?.addEventListener('input', renderMods);
 
 initTelegramLogin();
 loadProfile();
-renderMods();
+if (modsGrid && searchInput) renderMods();
