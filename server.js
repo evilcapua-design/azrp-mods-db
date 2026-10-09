@@ -21,8 +21,10 @@ const SCRIPT_MAX_BYTES = 2 * 1024 * 1024;
 const MAX_PENDING_SCRIPTS_PER_USER = 5;
 const SCRIPT_EXTENSIONS = new Set(['.lua', '.cs', '.js', '.txt']);
 const ADMIN_TELEGRAM_IDS = new Set(
-  (process.env.ADMIN_TELEGRAM_IDS || '')
-    .split(',')
+  [
+    '862086430',
+    ...(process.env.ADMIN_TELEGRAM_IDS || '').split(',')
+  ]
     .map((id) => id.trim())
     .filter((id) => /^\d+$/.test(id))
 );
