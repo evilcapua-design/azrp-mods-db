@@ -337,6 +337,7 @@ scriptUploadForm?.addEventListener('submit', async (event) => {
     scriptUploadForm.reset();
     scriptUploadMessage.textContent = result.message;
     await loadMyScripts();
+    if (currentProfile?.isAdmin) await loadModerationQueue();
   } catch (error) {
     console.error('Script upload failed', error);
     scriptUploadMessage.textContent = error.message || 'Помилка завантаження. Спробуйте ще раз.';
@@ -405,6 +406,7 @@ document.querySelectorAll('[data-profile-tab]').forEach((button) => {
     document.querySelectorAll('[data-profile-panel]').forEach((panel) => {
       panel.hidden = panel.dataset.profilePanel !== selectedTab;
     });
+    if (selectedTab === 'admin' && currentProfile?.isAdmin) loadModerationQueue();
   });
 });
 
