@@ -24,7 +24,7 @@ services:
       - key: TELEGRAM_BOT_TOKEN
         sync: false
       - key: ADMIN_TELEGRAM_IDS
-        sync: false
+        value: "862086430"
 
 databases:
   - name: azrp-mods-db

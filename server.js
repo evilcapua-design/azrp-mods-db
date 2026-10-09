@@ -431,8 +431,8 @@ app.post(
     if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
       return res.status(400).json({ success: false, message: 'Choose a non-empty script file' });
     }
-    if (req.body.includes(0) || !Buffer.from(req.body.toString('utf8'), 'utf8').equals(req.body)) {
-      return res.status(400).json({ success: false, message: 'Script files must be valid UTF-8 text' });
+    if (req.body.includes(0)) {
+      return res.status(400).json({ success: false, message: 'Файл скрипту не має містити нульових байтів' });
     }
 
     const title = String(req.query.title || '').trim();
